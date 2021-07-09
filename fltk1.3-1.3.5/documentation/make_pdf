@@ -1,0 +1,55 @@
+#! /bin/sh
+#
+# $Id$
+#
+# Makefile helper script for the Fast Light Tool Kit (FLTK) documentation.
+#
+# Copyright 1998-2015 by Bill Spitzak and others.
+#
+# This library is free software. Distribution and use rights are outlined in
+# the file "COPYING" which should have been included with this file.  If this
+# file is missing or damaged, see the license at:
+#
+#     http://www.fltk.org/COPYING.php
+#
+# Please report all bugs and problems on the following page:
+#
+#      http://www.fltk.org/str.php
+#
+
+# This script generates latex/refman.pdf after doxygen has been executed.
+#
+# Input:  run `doxygen Doxybook' (creates files in subdirectory latex)
+# Output: latex/refman.pdf (if successful)
+#
+# Next step: cp -f latex/refman.pdf fltk.pdf (why is this extra step needed ?)
+#
+# Working directory: fltk/documentation
+#
+# Used in: Makefile and CMakeLists.txt
+
+PDF_DATE=`date -ud "$DEB_DATE" +D:%Y%m%d%H%M%SZ`
+run_pdflatex() {
+  pdflatex --interaction=nonstopmode \
+    "\pdfinfo{/CreationDate($PDF_DATE)/ModDate($PDF_DATE)}\input{refman.tex}"
+}
+
+( cd latex
+  sed -i 's/\(\\caption{\(\\mbox{\)\?\)\\hyperlink{[^}]*}/\1/' \
+      classFl__Input.tex classFl__Tree.tex
+  run_pdflatex
+  makeindex refman.idx
+  run_pdflatex
+  latex_count=5
+  while egrep -s 'Rerun (LaTeX|to get cross-references right)' refman.log \
+	  && [ $latex_count -gt 0 ]
+    do
+      echo "Rerunning pdflatex ..."
+      run_pdflatex
+      latex_count=`expr $latex_count - 1`
+    done
+  cd ..) > pdfall.log 2>&1
+
+#
+# End of "$Id$".
+#
