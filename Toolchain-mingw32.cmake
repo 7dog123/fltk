@@ -6,7 +6,7 @@ set(CMAKE_C_COMPILER   /usr/bin/i686-w64-mingw32-gcc)
 set(CMAKE_CXX_COMPILER /usr/bin/i686-w64-mingw32-g++)
 
 # here is where the target environment located
-set(CMAKE_FIND_ROOT_PATH  /usr/i686-w64-mingw32)
+set(CMAKE_FIND_ROOT_PATH  /usr/)
 
 # adjust the default behaviour of the FIND_XXX() commands:
 # search programs in the host environment
